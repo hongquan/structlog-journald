@@ -16,6 +16,9 @@ cython = ["cysystemd >= 2.0.1"]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[tool.hatch.version]
+path = "src/structlog_journald/__init__.py"
+
 [tool.ruff]
 line-length = 120
 exclude = [

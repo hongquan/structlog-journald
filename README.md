@@ -1,25 +1,28 @@
 # structlog-journald
 
+![made-in-vietnam](https://madewithlove.vercel.app/vn?heart=true&colorA=%23ffcd00&colorB=%23da251d)
+
 Structlog processor to send logs to journald.
 
 Installation
 ------------
 
-To install structlog-journald, run:
+To install `structlog-journald`, run:
 
-```bash
+```sh
 pip install structlog-journald
 ```
 
 You also need to install one of the journald binding implementations:
 
-- CPython-based `systemd-python`.
-- Cython-based `cysystemd`.
+- CPython-based [`systemd-python`](https://pypi.org/project/systemd-python/).
+- Cython-based [`cysystemd`](https://pypi.org/project/cysystemd/).
 
 Usage
 -----
 
 Add the `structlog_journald.JournaldProcessor` to your list of structlog processors.
+
 Before it, you should add the `CallsiteParameterAdder`.
 
 ```py
