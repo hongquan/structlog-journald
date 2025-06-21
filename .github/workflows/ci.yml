@@ -16,7 +16,9 @@ jobs:
         with:
           enable-cache: true
       - name: Install dependencies
-        run: uv sync --group lint --no-install-project
+        run: |
+          sudo apt-get install -y libsystemd-dev pkg-config
+          uv sync --group lint --no-install-project
       - name: Run Ruff
         run: |
           uv run ruff check
