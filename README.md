@@ -4,6 +4,8 @@
 
 Structlog processor to send logs to journald.
 
+Homepage: [https://github.com/hongquan/structlog-journald](https://github.com/hongquan/structlog-journald)
+
 Installation
 ------------
 
