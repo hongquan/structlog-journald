@@ -1,7 +1,8 @@
 # structlog-journald
 
 ![made-in-vietnam](https://madewithlove.vercel.app/vn?heart=true&colorA=%23ffcd00&colorB=%23da251d)
-[![Documentation Status](https://readthedocs.org/projects/structlog-journald/badge/?version=latest)](https://structlog-journald.readthedocs.io?badge=latest)
+[![structlog-journald](https://badge.fury.io/py/structlog-journald.svg)](https://pypi.org/project/structlog-journald/)
+[![ReadTheDocs](https://readthedocs.org/projects/structlog-journald/badge/?version=latest)](https://structlog-journald.readthedocs.io?badge=latest)
 
 Structlog processor to send logs to journald.
 
@@ -63,3 +64,5 @@ log = structlog.stdlib.get_logger()
 
 log.info('Hello, world!')
 ```
+
+![Journalctl](https://raw.githubusercontent.com/hongquan/structlog-journald/refs/heads/main/misc/screenshot.png)
