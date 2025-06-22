@@ -1,10 +1,11 @@
 # structlog-journald
 
 ![made-in-vietnam](https://madewithlove.vercel.app/vn?heart=true&colorA=%23ffcd00&colorB=%23da251d)
+[![Documentation Status](https://readthedocs.org/projects/structlog-journald/badge/?version=latest)](https://structlog-journald.readthedocs.io?badge=latest)
 
 Structlog processor to send logs to journald.
 
-Homepage: [https://github.com/hongquan/structlog-journald](https://github.com/hongquan/structlog-journald)
+Documentation: [https://structlog-journald.readthedocs.io](https://structlog-journald.readthedocs.io)
 
 Installation
 ------------

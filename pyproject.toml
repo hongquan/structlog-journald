@@ -20,6 +20,7 @@ classifiers = [
 [project.urls]
 Homepage = "https://github.com/hongquan/structlog-journald"
 Repository = "https://github.com/hongquan/structlog-journald"
+Documentation = "https://structlog-journald.readthedocs.io"
 
 [project.optional-dependencies]
 cpython = ["systemd-python >= 235"]
