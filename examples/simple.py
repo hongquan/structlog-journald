@@ -13,6 +13,7 @@ structlog.configure(
         structlog.processors.add_log_level,
         structlog.processors.CallsiteParameterAdder(),
         structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
         structlog.dev.set_exc_info,
         structlog.processors.TimeStamper(fmt='%Y-%m-%d %H:%M:%S', utc=False),
         structlog.processors.EventRenamer('message'),
@@ -33,3 +34,7 @@ user = getpass.getuser()
 
 log.info('Current Linux user: %s', user, linux=platform.freedesktop_os_release())
 log.warning('This is a warning.', platform=platform.platform())
+try:
+    int('abc')
+except ValueError:
+    log.exception('Failed to convert string to integer.')

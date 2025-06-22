@@ -26,7 +26,12 @@ Usage
 
 Add the `structlog_journald.JournaldProcessor` to your list of structlog processors.
 
-Before it, you should add the `CallsiteParameterAdder`.
+To let the log has more useful information, you should also add these processors before `JournaldProcessor`:
+
+- `CallsiteParameterAdder`
+- `format_exc_info`
+
+Example:
 
 ```py
 import logging
@@ -41,6 +46,7 @@ structlog.configure(
         structlog.processors.add_log_level,
         structlog.processors.CallsiteParameterAdder(),
         structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
         structlog.dev.set_exc_info,
         structlog.processors.TimeStamper(fmt='%Y-%m-%d %H:%M:%S', utc=False),
         structlog.processors.EventRenamer('message'),
