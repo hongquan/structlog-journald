@@ -8,12 +8,12 @@
 ### Changed
 - Be more flexible when library user pass non-string to `message`.
 
-## 0.2.0 - 2026-06-22
+## [0.2.0] - 2026-06-22
 
-## Added
+### Added
 - Include traceback for log.exception.
 
-## 0.1.0 - 2026-06-21
+## [0.1.0] - 2026-06-21
 
 _Initial release._
 
