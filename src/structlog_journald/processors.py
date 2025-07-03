@@ -67,27 +67,32 @@ class JournaldProcessor:
         if code_line := event_dict.get(CallsiteParameter.LINENO.value):
             callsite_info['CODE_LINE'] = code_line
         extra_fields = self._extract_extra_fields(event_dict)
+        extra_fields.update(callsite_info)
         if self.syslog_identifier:
             extra_fields['SYSLOG_IDENTIFIER'] = self.syslog_identifier
+
+        # Though that we expect `message` to be string, library user may not apply type-checking
+        # and pass arbitrary data, so we will convert to string.
+        message_str = message if isinstance(message, str) else str(message, errors='replace')
 
         # When the logger was called with 'exception()' or 'aexception()' methods, we also send the exception information.
         # Note: When testing, the method name then is still 'error'. I don't know how structlog defines the method name.
         if method_name in ('exception', 'aexception', 'error', 'aerror'):
             # The event_dict may already be populated an "exception" item by 'format_exc_info' processor.
             if exc_str := event_dict.get('exception'):
-                message += f'\n{exc_str}'
+                message_str += f'\n{exc_str}'
             # In case 'format_exc_info' was not in the chain, we just send "exc_info" to the `EXCEPTION_INFO` field like
             # JournalHandler (from systemd-python) does.
             elif exc_info := event_dict.get('exc_info'):
-                message += f'\n{exc_info}'
+                message_str += f'\n{exc_info}'
                 extra_fields['EXCEPTION_INFO'] = exc_info
             elif method_name in ('exception', 'aexception'):
-                message += '\n(Missing exception information)'
+                message_str += '\n(Missing exception information)'
 
         if CY:
-            send_to_cysystemd_journal(message, priority, **extra_fields)
+            send_to_cysystemd_journal(message_str, priority, **extra_fields)
         else:
-            send_to_standard_journal(message, priority, **extra_fields)
+            send_to_standard_journal(message_str, priority, **extra_fields)
         if self.drop:
             raise DropEvent
         return event_dict

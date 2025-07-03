@@ -3,6 +3,7 @@
 ![made-in-vietnam](https://madewithlove.vercel.app/vn?heart=true&colorA=%23ffcd00&colorB=%23da251d)
 [![structlog-journald](https://badge.fury.io/py/structlog-journald.svg)](https://pypi.org/project/structlog-journald/)
 [![ReadTheDocs](https://readthedocs.org/projects/structlog-journald/badge/?version=latest)](https://structlog-journald.readthedocs.io?badge=latest)
+[![Common Changelog](https://common-changelog.org/badge.svg)](https://common-changelog.org)
 
 Structlog processor to send logs to journald.
 

@@ -9,3 +9,5 @@ wheels/
 
 # Virtual environments
 .venv
+# The source distribution should not include lock file.
+uv.lock
