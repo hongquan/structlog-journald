@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, TypedDict
 
 from structlog import DropEvent
 from structlog.processors import CallsiteParameter
@@ -6,6 +6,17 @@ from structlog.typing import EventDict, WrappedLogger
 
 from .consts import CY, LEVEL_TO_PRIORITY
 from .detect import is_journald_connected
+
+
+# Items in EventDict, which are used by other processors
+# and should not be rendered by us.
+OTHER_PROCESSOR_KEYS = ('message', 'event', 'exec_info', 'exception', 'level', 'timestamp', 'stack', 'stack_info')
+
+
+class CallsiteInfo(TypedDict, total=False):
+    CODE_FUNC: str
+    CODE_FILE: str
+    CODE_LINE: int
 
 
 class JournaldProcessor:
@@ -45,6 +56,34 @@ class JournaldProcessor:
             return {}
         return {k.upper(): v for k, v in event_dict.items() if k.startswith(self.extra_field_prefix)}
 
+    def _extract_callsite_info(self, event_dict: EventDict) -> CallsiteInfo:
+        """
+        Retrieve callsite info which CallsiteParameterAdder has added
+        """
+        info: CallsiteInfo = {}
+        if func_name := event_dict.get(CallsiteParameter.FUNC_NAME.value):
+            info['CODE_FUNC'] = func_name
+        if code_file := event_dict.get(CallsiteParameter.PATHNAME.value):
+            info['CODE_FILE'] = code_file
+        if code_line := event_dict.get(CallsiteParameter.LINENO.value):
+            info['CODE_LINE'] = code_line
+        return info
+
+    def _format_extra_items(self, event_dict: EventDict) -> str:
+        """
+        Format extra items (other than the message) in event_dict as key=value.
+        """
+        ignored_keys: set[str] = {*OTHER_PROCESSOR_KEYS, *[p.value for p in CallsiteParameter]}
+        if self.extra_field_prefix:
+            ignored_keys.update(k for k in event_dict.keys() if k.startswith(self.extra_field_prefix))
+        pairs: list[str] = []
+        for k, v in event_dict.items():
+            # We also skip keys which start with '_'. They are for structlog internal use.
+            if k.startswith('_') or k in ignored_keys:
+                continue
+            pairs.append(f'{k}={v!r}')
+        return ' '.join(pairs)
+
     def __call__(self, logger: WrappedLogger, method_name: str, event_dict: EventDict) -> EventDict:
         if not is_journald_connected():
             return event_dict
@@ -58,14 +97,7 @@ class JournaldProcessor:
             return event_dict
         default_priority = LEVEL_TO_PRIORITY['info']
         priority = LEVEL_TO_PRIORITY.get(method_name, default_priority)
-        # Retrieve callsite info which CallsiteParameterAdder has added
-        callsite_info = {}
-        if func_name := event_dict.get(CallsiteParameter.FUNC_NAME.value):
-            callsite_info['CODE_FUNC'] = func_name
-        if code_file := event_dict.get(CallsiteParameter.PATHNAME.value):
-            callsite_info['CODE_FILE'] = code_file
-        if code_line := event_dict.get(CallsiteParameter.LINENO.value):
-            callsite_info['CODE_LINE'] = code_line
+        callsite_info = self._extract_callsite_info(event_dict)
         extra_fields = self._extract_extra_fields(event_dict)
         extra_fields.update(callsite_info)
         if self.syslog_identifier:
@@ -75,13 +107,16 @@ class JournaldProcessor:
         # and pass arbitrary data, so we will convert to string.
         message_str = message if isinstance(message, str) else str(message, errors='replace')
 
-        # When the logger was called with 'exception()' or 'aexception()' methods, we also send the exception information.
+        if key_value_extra := self._format_extra_items(event_dict):
+            message_str += '\n' + key_value_extra
+
+        # When the logger was called with `exception()` or `aexception()` methods, we also send the exception information.
         # Note: When testing, the method name then is still 'error'. I don't know how structlog defines the method name.
         if method_name in ('exception', 'aexception', 'error', 'aerror'):
-            # The event_dict may already be populated an "exception" item by 'format_exc_info' processor.
+            # The event_dict may already be populated an "exception" item by `format_exc_info` processor.
             if exc_str := event_dict.get('exception'):
                 message_str += f'\n{exc_str}'
-            # In case 'format_exc_info' was not in the chain, we just send "exc_info" to the `EXCEPTION_INFO` field like
+            # In case `format_exc_info` was not in the chain, we just send "exc_info" to the `EXCEPTION_INFO` field like
             # JournalHandler (from systemd-python) does.
             elif exc_info := event_dict.get('exc_info'):
                 message_str += f'\n{exc_info}'

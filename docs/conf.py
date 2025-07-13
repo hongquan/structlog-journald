@@ -16,6 +16,7 @@ author = 'Nguyễn Hồng Quân <ng.hong.quan@gmail.com>'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
+    'myst_parser',
 ]
 
 templates_path = ['_templates']

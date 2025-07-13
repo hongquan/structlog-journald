@@ -18,12 +18,14 @@ structlog.configure(
         structlog.processors.TimeStamper(fmt='%Y-%m-%d %H:%M:%S', utc=False),
         structlog.processors.EventRenamer('message'),
         JournaldProcessor(),
+        # This processor should be added for development environment only.
         structlog.dev.ConsoleRenderer(),
     ],
+    # In this example, we want to print log entries of all levels
     wrapper_class=structlog.make_filtering_bound_logger(logging.NOTSET),
     context_class=dict,
-    logger_factory=structlog.PrintLoggerFactory(),
-    cache_logger_on_first_use=False,
+    logger_factory=structlog.WriteLoggerFactory(),
+    cache_logger_on_first_use=True,
 )
 
 log = structlog.stdlib.get_logger()

@@ -7,6 +7,9 @@ dist/
 wheels/
 *.egg-info
 
+.ruff_cache
+.mypy_cache
+
 # Virtual environments
 .venv
 # The source distribution should not include lock file.

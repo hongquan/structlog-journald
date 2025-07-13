@@ -1,7 +1,5 @@
-structlog-journald
-==================
-
-Processor for `structlog <https://www.structlog.org/>`_ to send logs to `journald <https://www.freedesktop.org/software/systemd/man/journalctl.html>`_.
+.. include:: ../README.md
+   :parser: myst_parser.sphinx_
 
 
 .. toctree::
