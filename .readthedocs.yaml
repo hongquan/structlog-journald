@@ -20,6 +20,9 @@ sphinx:
 # Set the OS, Python version, and other tools you might need
 build:
   os: ubuntu-24.04
+  apt_packages:
+    - pkg-config
+    - libsystemd-dev
   tools:
     python: "3.13"
   jobs:
