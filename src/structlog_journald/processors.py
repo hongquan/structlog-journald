@@ -62,7 +62,7 @@ class JournaldProcessor:
         callsite_info = {}
         if func_name := event_dict.get(CallsiteParameter.FUNC_NAME.value):
             callsite_info['CODE_FUNC'] = func_name
-        if code_file := event_dict.get(CallsiteParameter.FILENAME.value):
+        if code_file := event_dict.get(CallsiteParameter.PATHNAME.value):
             callsite_info['CODE_FILE'] = code_file
         if code_line := event_dict.get(CallsiteParameter.LINENO.value):
             callsite_info['CODE_LINE'] = code_line
