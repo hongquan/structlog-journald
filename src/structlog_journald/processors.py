@@ -157,6 +157,7 @@ def send_to_cysystemd_journal(message: str, priority: int, **extra_fields: dict[
     try:
         from cysystemd import journal
 
-        journal.send(message, priority=priority, **extra_fields)
+        # cysystemd doesn't allow positional arguments.
+        journal.send(message=message, priority=priority, **extra_fields)
     except ModuleNotFoundError:
         pass
