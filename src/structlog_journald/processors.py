@@ -14,9 +14,12 @@ OTHER_PROCESSOR_KEYS = ('message', 'event', 'exec_info', 'exception', 'level', '
 
 
 class CallsiteInfo(TypedDict, total=False):
+    MODULE: str
+    # These fields follow name convention from https://www.freedesktop.org/software/systemd/man/latest/systemd.journal-fields.html
     CODE_FUNC: str
     CODE_FILE: str
     CODE_LINE: int
+    TID: int
 
 
 class JournaldProcessor:
@@ -51,6 +54,12 @@ class JournaldProcessor:
         self.extra_field_prefix = extra_field_prefix
         self.drop = drop
 
+    def _extract_common_fields(self, event_dict: EventDict) -> dict[str, Any]:
+        # This field is populated by `add_logger_name` processor.
+        if logger_name := event_dict.get('logger'):
+            return {'LOGGER': logger_name}
+        return {}
+
     def _extract_extra_fields(self, event_dict: EventDict) -> dict[str, Any]:
         if not self.extra_field_prefix:
             return {}
@@ -61,12 +70,16 @@ class JournaldProcessor:
         Retrieve callsite info which CallsiteParameterAdder has added
         """
         info: CallsiteInfo = {}
+        if module_name := event_dict.get(CallsiteParameter.MODULE.value):
+            info['MODULE'] = module_name
         if func_name := event_dict.get(CallsiteParameter.FUNC_NAME.value):
             info['CODE_FUNC'] = func_name
         if code_file := event_dict.get(CallsiteParameter.PATHNAME.value):
             info['CODE_FILE'] = code_file
         if code_line := event_dict.get(CallsiteParameter.LINENO.value):
             info['CODE_LINE'] = code_line
+        if thread_id := event_dict.get(CallsiteParameter.THREAD.value):
+            info['TID'] = thread_id
         return info
 
     def _format_extra_items(self, event_dict: EventDict) -> str:
@@ -97,11 +110,12 @@ class JournaldProcessor:
             return event_dict
         default_priority = LEVEL_TO_PRIORITY['info']
         priority = LEVEL_TO_PRIORITY.get(method_name, default_priority)
+        journal_extra_fields = self._extract_common_fields(event_dict)
         callsite_info = self._extract_callsite_info(event_dict)
-        extra_fields = self._extract_extra_fields(event_dict)
-        extra_fields.update(callsite_info)
+        journal_extra_fields.update(self._extract_extra_fields(event_dict))
+        journal_extra_fields.update(callsite_info)
         if self.syslog_identifier:
-            extra_fields['SYSLOG_IDENTIFIER'] = self.syslog_identifier
+            journal_extra_fields['SYSLOG_IDENTIFIER'] = self.syslog_identifier
 
         # Though that we expect `message` to be string, library user may not apply type-checking
         # and pass arbitrary data, so we will convert to string.
@@ -120,14 +134,14 @@ class JournaldProcessor:
             # JournalHandler (from systemd-python) does.
             elif exc_info := event_dict.get('exc_info'):
                 message_str += f'\n{exc_info}'
-                extra_fields['EXCEPTION_INFO'] = exc_info
+                journal_extra_fields['EXCEPTION_INFO'] = exc_info
             elif method_name in ('exception', 'aexception'):
                 message_str += '\n(Missing exception information)'
 
         if CY:
-            send_to_cysystemd_journal(message_str, priority, **extra_fields)
+            send_to_cysystemd_journal(message_str, priority, **journal_extra_fields)
         else:
-            send_to_standard_journal(message_str, priority, **extra_fields)
+            send_to_standard_journal(message_str, priority, **journal_extra_fields)
         if self.drop:
             raise DropEvent
         return event_dict
