@@ -25,10 +25,10 @@ class CallsiteInfo(TypedDict, total=False):
 class JournaldProcessor:
     """Processor for sending log events to journald.
 
-    ``journald`` allows to attach extra fields to a log entry. These fields are extracted from structlog's ``event_dict``.
+    ``journald`` allows to attach extra fields to a log entry. These fields are extracted from *structlog*'s ``event_dict``.
     The selection is based on the keys starting with the specified prefix.
-    For example, if the prefix is ``'f_'``, the items with ``'f_blah'``, ``'f_baz'`` keys will be sent to journald as extra fields.
-    Note that, by journald convention, these keys will be converted to uppercase, so ``'f_blah'`` will be sent as ``'F_BLAH'``.
+    For example, if the prefix is ``'f_'``, the items with ``'f_blah'``, ``'f_baz'`` keys will be sent to *journald* as extra fields.
+    Note that, by *journald* convention, these keys will be converted to uppercase, so ``'f_blah'`` will be sent as ``'F_BLAH'``.
     """
 
     syslog_identifier: str | None

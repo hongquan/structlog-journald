@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.0]
+
+### Fixed
+- Call cysystemd's journal.send correctly.
+
+### Added
+- Collect more fields to send to journald: MODULE, TID, LOGGER.
+
 ## [0.4.0] - 2025-07-13
 
 ### Fixed
