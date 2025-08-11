@@ -20,3 +20,7 @@ When viewing logs with ``journalctl``, we can filter with ``F_FARM`` option:
 .. code-block:: shell
 
 	journalctl -u our-unit F_FARM=tomato
+
+See it in action:
+
+.. asciinema:: 732895

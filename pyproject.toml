@@ -75,6 +75,7 @@ docs = [
     "sphinx-autobuild>=2024.10.3",
     "sphinx>=8.2.3",
     "sphinx-book-theme>=1.1.4",
+    "sphinxcontrib-asciinema>=0.4.2",
 ]
 lint = ["ruff>=0.12.0"]
 test = [

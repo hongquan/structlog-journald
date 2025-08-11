@@ -17,6 +17,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
     'myst_parser',
+    'sphinxcontrib.asciinema',
 ]
 
 templates_path = ['_templates']

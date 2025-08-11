@@ -1,12 +1,13 @@
 # Changelog
 
-## [0.5.0]
+## [0.5.0] - 2025-08-11
 
 ### Fixed
 - Call cysystemd's journal.send correctly.
 
 ### Added
 - Collect more fields to send to journald: MODULE, TID, LOGGER.
+- Write documentation for how to attach extra info to journald log entry and filter by it.
 
 ## [0.4.0] - 2025-07-13
 
@@ -34,6 +35,7 @@
 
 _Initial release._
 
+[0.5.0]: https://github.com/hongquan/structlog-journald/releases/tag/v0.5.0
 [0.4.0]: https://github.com/hongquan/structlog-journald/releases/tag/v0.4.0
 [0.3.0]: https://github.com/hongquan/structlog-journald/releases/tag/v0.3.0
 [0.2.0]: https://github.com/hongquan/structlog-journald/releases/tag/v0.2.0
