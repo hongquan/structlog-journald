@@ -1,5 +1,9 @@
+import concurrent.futures
 import logging
 import random
+import time
+from concurrent.futures import ThreadPoolExecutor
+from itertools import cycle
 
 import structlog
 from structlog.contextvars import bound_contextvars, clear_contextvars
@@ -37,14 +41,24 @@ def get_sensor_values() -> dict[str, int | float]:
     return {'temperature': random.randint(25, 30), 'humidity': random.randint(80, 99)}
 
 
+def pretend_to_compute_for_decision() -> None:
+    time.sleep(random.randint(2, 8) / 10)
+
+
+def pretend_to_run_pump() -> None:
+    time.sleep(random.randint(5, 20) / 10)
+
+
 def control_farm(farm_name: str) -> None:
     # To avoid repeatly passing `f_farm=farm_name` to each calls of info, debug,
     # we can just call bind() once.
     log = logger.bind(f_farm=farm_name)
     sensors = get_sensor_values()
     log.debug('Sensor values: %s', sensors)
+    pretend_to_compute_for_decision()
     log.warning('Farm %s is too hot', farm_name)
     log.info('Turn pump on...')
+    pretend_to_run_pump()
     log.info('Turn pump off.')
 
 
@@ -54,10 +68,20 @@ def control_farm_ctxv(farm_name: str) -> None:
     with bound_contextvars(f_farm=farm_name):
         sensors = get_sensor_values()
         logger.debug('Sensor values: %s', sensors)
+        pretend_to_compute_for_decision()
         logger.warning('Farm %s is too hot', farm_name)
         logger.info('Turn pump on...')
+        pretend_to_run_pump()
         logger.info('Turn pump off.')
 
 
-control_farm('tomato')
-control_farm_ctxv('rose')
+farms = ('tomato', 'rose', 'mushroom')
+jobs = []
+# Control farms in parallel to let logs mixed.
+with ThreadPoolExecutor(max_workers=2) as executor:
+    # The `flag` is simply for choosing one of the two control_xxx functions above.
+    for flag, farm in zip(cycle((False, True)), farms):
+        ft = executor.submit(control_farm_ctxv if flag else control_farm, farm)
+        jobs.append(ft)
+
+concurrent.futures.wait(jobs)
