@@ -4,7 +4,7 @@ description = "Structlog processor to send logs to journald"
 readme = "README.md"
 authors = [{ name = "Nguyễn Hồng Quân", email = "ng.hong.quan@gmail.com" }]
 license = "Apache-2.0"
-requires-python = ">=3.12"
+requires-python = ">=3.11"
 dependencies = ["structlog >= 25.1.0"]
 dynamic = ["version"]
 keywords = ["logging", "structlog", "journald", "systemd"]
