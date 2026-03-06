@@ -40,7 +40,10 @@ class JournaldProcessor:
     drop: bool
     """Whether to drop the event after sending it to journald."""
 
-    def __init__(self, syslog_identifier: str | None = None, extra_field_prefix: str = 'f_', drop: bool = True) -> None:
+    strip_extra_field_prefix: bool
+    """Whether to strip the extra field prefix before sending the fields to journald."""
+
+    def __init__(self, syslog_identifier: str | None = None, extra_field_prefix: str = 'f_', drop: bool = True, strip_extra_field_prefix: bool = False) -> None:
         """
         Args:
             syslog_identifier (str | None): The identifier to use when sending events to journald.
@@ -53,6 +56,7 @@ class JournaldProcessor:
         self.syslog_identifier = syslog_identifier
         self.extra_field_prefix = extra_field_prefix
         self.drop = drop
+        self.strip_extra_field_prefix = strip_extra_field_prefix
 
     def _extract_common_fields(self, event_dict: EventDict) -> dict[str, Any]:
         # This field is populated by `add_logger_name` processor.
@@ -63,7 +67,10 @@ class JournaldProcessor:
     def _extract_extra_fields(self, event_dict: EventDict) -> dict[str, Any]:
         if not self.extra_field_prefix:
             return {}
-        return {k.upper(): v for k, v in event_dict.items() if k.startswith(self.extra_field_prefix)}
+        return {
+            (k.removeprefix(self.extra_field_prefix) if self.strip_extra_field_prefix else k).upper(): v
+            for k, v in event_dict.items() if k.startswith(self.extra_field_prefix)
+        }
 
     def _extract_callsite_info(self, event_dict: EventDict) -> CallsiteInfo:
         """
