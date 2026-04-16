@@ -1,10 +1,11 @@
 from typing import Any, TypedDict
 
+import journald_send
 from structlog import DropEvent
 from structlog.processors import CallsiteParameter
 from structlog.typing import EventDict, WrappedLogger
 
-from .consts import CY, LEVEL_TO_PRIORITY
+from .consts import LEVEL_TO_PRIORITY
 from .detect import is_journald_connected
 
 
@@ -131,33 +132,14 @@ class JournaldProcessor:
             if exc_str := event_dict.get('exception'):
                 message_str += f'\n{exc_str}'
             # In case `format_exc_info` was not in the chain, we just send "exc_info" to the `EXCEPTION_INFO` field like
-            # JournalHandler (from systemd-python) does.
+            # JournalHandler (from journald-send) does.
             elif exc_info := event_dict.get('exc_info'):
                 message_str += f'\n{exc_info}'
                 journal_extra_fields['EXCEPTION_INFO'] = exc_info
             elif method_name in ('exception', 'aexception'):
                 message_str += '\n(Missing exception information)'
 
-        if CY:
-            send_to_cysystemd_journal(message_str, priority, **journal_extra_fields)
-        else:
-            send_to_standard_journal(message_str, priority, **journal_extra_fields)
+        journald_send.send(message_str, priority=priority, **journal_extra_fields)
         if self.drop:
             raise DropEvent
         return event_dict
-
-
-def send_to_standard_journal(message: str, priority: int, **extra_fields: dict[str, Any]) -> None:
-    from systemd import journal
-
-    journal.send(message, PRIORITY=priority, **extra_fields)
-
-
-def send_to_cysystemd_journal(message: str, priority: int, **extra_fields: dict[str, Any]) -> None:
-    try:
-        from cysystemd import journal
-
-        # cysystemd doesn't allow positional arguments.
-        journal.send(message=message, priority=priority, **extra_fields)
-    except ModuleNotFoundError:
-        pass

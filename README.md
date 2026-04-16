@@ -18,10 +18,11 @@ To install `structlog-journald`, run:
 pip install structlog-journald
 ```
 
-You also need to install one of the journald binding implementations:
+Or with uv:
 
-- CPython-based [`systemd-python`](https://pypi.org/project/systemd-python/).
-- Cython-based [`cysystemd`](https://pypi.org/project/cysystemd/).
+```sh
+uv add structlog-journald
+```
 
 Usage
 -----
