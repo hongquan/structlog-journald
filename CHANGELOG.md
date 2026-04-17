@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.0] - 2026-04-17
+
+## Changed
+
+- Replace `systemd-python`, `cysystemd` with `journald-send`.
+
+
 ## [0.5.0] - 2025-08-11
 
 ### Fixed
@@ -35,6 +42,7 @@
 
 _Initial release._
 
+[1.0.0]: https://github.com/hongquan/structlog-journald/releases/tag/v1.0.0
 [0.5.0]: https://github.com/hongquan/structlog-journald/releases/tag/v0.5.0
 [0.4.0]: https://github.com/hongquan/structlog-journald/releases/tag/v0.4.0
 [0.3.0]: https://github.com/hongquan/structlog-journald/releases/tag/v0.3.0

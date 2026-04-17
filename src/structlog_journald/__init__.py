@@ -2,7 +2,7 @@ from .detect import is_journald_connected
 from .processors import JournaldProcessor
 
 
-__version__ = '0.6.0'
+__version__ = '1.0.0'
 
 
 __all__ = [

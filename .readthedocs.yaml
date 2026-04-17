@@ -4,9 +4,6 @@ sphinx:
   configuration: 'docs/conf.py'
 build:
   os: 'ubuntu-24.04'
-  apt_packages:
-    - 'pkg-config'
-    - 'libsystemd-dev'
   tools:
     python: '3.13'
   jobs:
@@ -17,4 +14,4 @@ build:
     create_environment:
       - 'uv venv "${READTHEDOCS_VIRTUALENV_PATH}"'
     install:
-      - 'UV_PROJECT_ENVIRONMENT="${READTHEDOCS_VIRTUALENV_PATH}" uv sync --group docs --extra cpython'
+      - 'UV_PROJECT_ENVIRONMENT="${READTHEDOCS_VIRTUALENV_PATH}" uv sync --group docs'
